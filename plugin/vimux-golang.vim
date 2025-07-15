@@ -1,5 +1,6 @@
 command! GolangTestCurrentPackage :call GolangTestCurrentPackage()
 command! GolangTestFocused :call GolangTestFocused()
+command! GolangTestCurrentFile :call GolangTestCurrentFile()
 command! GolangRun :call GolangRun()
 
 function! ShellCommandSeperator()
@@ -81,4 +82,14 @@ function! GolangRunOnChange()
   else
     echo "You must have inotify-tools installed"
   endif
+endfunction
+
+function! GolangTestCurrentFile()
+  let filename = expand('%:t')
+  if filename !~# '_test.go$'
+    echo "Not a test file"
+    return
+  endif
+
+  call VimuxRunCommand("cd " . GolangCwd() . " " . s:separator . " clear " . s:separator . " go test -v " . filename)
 endfunction
