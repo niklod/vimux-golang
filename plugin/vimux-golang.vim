@@ -1,6 +1,7 @@
 command! GolangTestCurrentPackage :call GolangTestCurrentPackage()
 command! GolangTestFocused :call GolangTestFocused()
 command! GolangTestCurrentFile :call GolangTestCurrentFile()
+command! GolangTestLatest :call GolangTestLatest()
 command! GolangRun :call GolangRun()
 
 function! ShellCommandSeperator()
@@ -46,6 +47,7 @@ function! GolangTestFocused()
     let line = getline(test_line)
     let test_name_raw = split(line, " ")[1]
     let test_name = split(test_name_raw, "(")[0]
+    let g:last_golang_test_name = test_name
 
     call VimuxRunCommand("cd " . GolangCwd() . " " . s:separator . " clear " . s:separator . " go test " . GolangFocusedCommand(test_name) . " -v " . GolangCurrentPackage())
   else
@@ -92,4 +94,14 @@ function! GolangTestCurrentFile()
   endif
 
   call VimuxRunCommand("cd " . GolangCwd() . " " . s:separator . " clear " . s:separator . " go test -v " . filename)
+endfunction
+
+function! GolangTestLatest()
+  if !exists("g:last_golang_test_name") || empty(g:last_golang_test_name)
+    echo "No test has been run yet"
+    return
+  endif
+
+  let test_name = g:last_golang_test_name
+  call VimuxRunCommand("cd " . GolangCwd() . " " . s:separator . " clear " . s:separator . " go test " . GolangFocusedCommand(test_name) . " -v " . GolangCurrentPackage())
 endfunction
